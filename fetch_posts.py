@@ -1,9 +1,13 @@
 import praw
 import pandas as pd
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 reddit = praw.Reddit(
-    client_id="k9EcZYyCzvVI7LphStYKxg",
-    client_secret="Ys9e2CafoVH9KHvYeW3kTKST7eeOwQ",
+    client_id=os.getenv("REDDIT_CLIENT_ID"),
+    client_secret=os.getenv("REDDIT_CLIENT_SECRET"),
     user_agent="script:reddit_popularity:v1.0 (by u/tvoj_username)"
 )
 
