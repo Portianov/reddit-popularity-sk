@@ -37,19 +37,19 @@ meta_features = df[["title_length", "hour", "day_of_week", "is_weekend"]]
 scaler = StandardScaler()
 meta_scaled = scaler.fit_transform(meta_features)
 
-# TF-IDF reprezentacia nadpisov
+#TF-IDF reprezentacia nadpisov
 tfidf = TfidfVectorizer(max_features=300)
 tfidf_features = tfidf.fit_transform(df["title"].astype(str)).toarray()
 
-# BERT embeddingy (SentenceTransformer)
+#BERT embeddingy (SentenceTransformer)
 print("Nacitavam SentenceTransformer a generujem embeddingy...")
 st_model = SentenceTransformer("all-MiniLM-L6-v2")
 embeddings = st_model.encode(df["title"].astype(str), show_progress_bar=True)
 
-# Spojenie vsetkych priznakóv do jednej matice
+#Spojenie vsetkych priznakóv do jednej matice
 X_full = np.concatenate([meta_scaled, tfidf_features, embeddings], axis=1)
 
-# Balansovanie tried pomocou SMOTE
+#Balansovanie tried pomocou SMOTE
 smote = SMOTE(random_state=42)
 X_resampled, y_resampled = smote.fit_resample(X_full, y)
 
