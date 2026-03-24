@@ -93,7 +93,7 @@ Pri práci som použil najmä:
 
 Týždenný denník:
 
-=24,03 Oprava Reddit API
+-24,03 Oprava Reddit API
 
 -25.03 Dalšij zber dát z Redditu  
 - ich spracovaniu a analýze
