@@ -6,10 +6,10 @@ Tento repozitár obsahuje materiály k mojej bakalárskej práci, ktorá sa zame
 
 ## Informácie o študentovi
 
-- **Meno:** [Tvoje meno]  
+- **Meno:** Yehor Portianov
 - **Názov práce:** Predikcia popularity príspevkov na Reddite  
-- **Vedúci práce:** [Meno vedúceho]  
-- **Kontakt:** [email]  
+- **Vedúci práce:** Marek Šuppa
+- **Kontakt:** portianov1@uniba.sk
 
 ---
 
