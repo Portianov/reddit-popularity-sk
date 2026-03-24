@@ -26,12 +26,12 @@ Analyzujem príspevky zo subredditu r/Slovakia a skúmam rôzne faktory, ako nap
 Používam vlastný dataset, ktorý obsahuje viac ako 3000 príspevkov.  
 Každý príspevok obsahuje napríklad:
 
-- názov (title)  
-- text (selftext)  
-- skóre (score)  
+- názov
+- text
+- skóre
 - počet komentárov  
 - čas publikovania  
-- kategóriu (flair)
+- kategóriu
 - a t.d.
 
 Tieto údaje tvoria základ pre ďalšiu analýzu a modelovanie.
