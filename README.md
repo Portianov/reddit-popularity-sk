@@ -1,102 +1,174 @@
-# Predikcia popularity príspevkov na Reddite
+# Reddit Popularity Prediction for Slovak Reddit Posts
 
-Tento repozitár obsahuje materiály k mojej bakalárskej práci, ktorá sa zameriava na analýzu príspevkov zo sociálnej siete Reddit a predikciu ich popularity pomocou metód strojového učenia.
+This repository contains the code, dataset and experiment outputs used for a bachelor thesis focused on predicting the popularity of Reddit posts related to Slovakia.
 
----
+The project studies whether the popularity of a Reddit post can be predicted from its text and metadata. Popularity is treated as a three-class classification problem:
 
-## Informácie o študentovi
+- `0` — low popularity,
+- `1` — medium popularity,
+- `2` — high popularity.
 
-- **Meno:** Yehor Portianov
-- **Názov práce:** Predikcia popularity príspevkov na Reddite  
-- **Vedúci práce:** Marek Šuppa
-- **Kontakt:** portianov1@uniba.sk
+The classes are created from the Reddit `score` column using the 25th and 75th percentiles.
 
----
+## Main contribution
 
-## O čom je práca
+The repository supports the thesis contribution in three ways:
 
-V práci sa snažím odpovedať na otázku, prečo sú niektoré príspevky na Reddite úspešné a iné nie. Zameriavam sa na to, či sa dá popularita príspevku odhadnúť ešte pred jeho publikovaním na základe dostupných údajov.
+1. It contains a dataset of Reddit posts related to Slovakia and Slovak online communities.
+2. It compares several feature representations: metadata, TF-IDF and multilingual Sentence-BERT embeddings.
+3. It includes additional analysis of factors related to popularity, such as publication time, content type and flair category.
 
-Analyzujem príspevky zo subredditu r/Slovakia a skúmam rôzne faktory, ako napríklad text príspevku, čas publikovania alebo počet komentárov.
+The project is focused on the Slovak and partially multilingual Reddit environment. This is relevant because the dataset contains posts from Slovak subreddits as well as international subreddits filtered by Slovakia-related keywords.
 
----
+## Repository structure
 
-## Dáta
+```text
+.
+├── data/
+│   └── reddit_slovakia_raw_big_20260220_101852.csv
+├── figures/
+│   └── generated figures used in the thesis
+├── results/
+│   └── CSV/TXT outputs of the experiments
+├── src/
+│   ├── 01_fetch_posts.py
+│   ├── 02_time_analysis.py
+│   ├── 03_post_type_analysis.py
+│   ├── 04_flair_analysis.py
+│   ├── 05_feature_importance.py
+│   ├── 06_feature_comparison_logreg.py
+│   ├── 07_compare_all_models.py
+│   ├── 08_confusion_matrix.py
+│   └── utils.py
+├── .env.example
+├── .gitignore
+├── requirements.txt
+└── README.md
+```
 
-Používam vlastný dataset, ktorý obsahuje viac ako 3000 príspevkov.  
-Každý príspevok obsahuje napríklad:
+## Dataset
 
-- názov
-- text
-- skóre
-- počet komentárov  
-- čas publikovania  
-- kategóriu
-- a t.d.
+The final raw dataset is stored in:
 
-Tieto údaje tvoria základ pre ďalšiu analýzu a modelovanie.
+```text
+data/reddit_slovakia_raw_big_20260220_101852.csv
+```
 
----
+It contains public Reddit post metadata with the following fields:
 
-## Ako postupujem
+- `id`
+- `subreddit`
+- `title`
+- `score`
+- `num_comments`
+- `created_utc`
+- `upvote_ratio`
+- `selftext`
+- `flair`
+- `url`
 
-Najskôr som si dáta pripravil – očistil som ich a upravil do formy vhodnej pre analýzu.  
-Následne som vytvoril nové vlastnosti (features), napríklad:
+The target variable is not stored directly in the raw dataset. It is created in the scripts from the `score` column.
 
-- dĺžku titulku  
-- dĺžku textu  
-- čas publikovania (hodina, deň v týždni)  
+## Models and features
 
-Textové údaje som previedol do číselnej podoby, aby ich bolo možné použiť v modeloch.
+The experiments compare the following models:
 
-Na záver som testoval viaceré modely strojového učenia, napríklad:
+- Logistic Regression
+- Decision Tree
+- Random Forest
+- Support Vector Machine
+- XGBoost
 
-- logistickú regresiu  
-- random forest  
-- SVM  
-- XGBoost  
+The following feature groups are evaluated:
 
----
+- metadata only,
+- TF-IDF only,
+- BERT embeddings only,
+- metadata + TF-IDF,
+- metadata + BERT,
+- TF-IDF + BERT,
+- all features combined.
 
-## Výsledky
+Text embeddings are generated using:
 
-Zistil som, že popularitu príspevkov je možné do určitej miery predpovedať.  
-Najlepšie výsledky dosiahli modely Random Forest a XGBoost.
+```text
+sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+```
 
-Zaujímavé je, že veľkú rolu nehrá len samotný obsah, ale aj napríklad čas publikovania alebo dĺžka príspevku.
+## Installation
 
----
+Create and activate a virtual environment:
 
-## Na čo sa to dá využiť
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
 
-Výsledky práce by sa dali využiť napríklad:
+Install dependencies:
 
-- pri tvorbe obsahu na sociálnych sieťach  
-- v marketingu  
-- na lepšie pochopenie správania používateľov  
+```bash
+pip install -r requirements.txt
+```
 
----
+## Reddit API credentials
 
-## Použité technológie
+The data collection script uses Reddit API credentials. Do not commit real credentials to GitHub.
 
-Pri práci som použil najmä:
+Create a local `.env` file based on `.env.example`:
 
-- Python  
-- pandas, numpy  
-- scikit-learn  
-- XGBoost  
-- Reddit API  
+```bash
+REDDIT_CLIENT_ID=your_client_id_here
+REDDIT_CLIENT_SECRET=your_client_secret_here
+REDDIT_USER_AGENT=reddit_popularity:v1.0 (by u/your_username)
+```
 
----
+## Running the scripts
 
-## Priebeh práce
+Run scripts from the repository root.
 
-Týždenný denník:
+Time analysis:
 
--24,03 Oprava Reddit API
+```bash
+python src/02_time_analysis.py
+```
 
--25.03 Dalšij zber dát z Redditu  
-- ich spracovaniu a analýze
-   
--30.03 testovaniu modelov BERT a GPT2  
-- vyhodnotenie výsledkov  
+Post type analysis:
+
+```bash
+python src/03_post_type_analysis.py
+```
+
+Flair analysis:
+
+```bash
+python src/04_flair_analysis.py
+```
+
+Feature importance:
+
+```bash
+python src/05_feature_importance.py
+```
+
+Comparison of feature combinations using Logistic Regression:
+
+```bash
+python src/06_feature_comparison_logreg.py
+```
+
+Comparison of all models and feature combinations:
+
+```bash
+python src/07_compare_all_models.py
+```
+
+Confusion matrix for the best configuration:
+
+```bash
+python src/08_confusion_matrix.py
+```
+
+## Notes
+
+The `.env` file and IDE files are intentionally excluded from version control.  
+The repository should not contain Reddit API secrets.
