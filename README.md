@@ -230,7 +230,3 @@ Medzi hlavné výstupy patria napríklad:
 - `final_classification_reports.txt`,
 - grafy porovnania modelov,
 - finálne confusion matrix grafy.
-
-## Poznámka
-
-Súbor `.env` nie je súčasťou repozitára, pretože môže obsahovať Reddit API kľúče. Na GitHube je uložený iba ukážkový súbor `.env.example`.
