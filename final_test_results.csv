@@ -1,2 +1,0 @@
-model,features,test_size,test_samples,accuracy,macro_f1
-XGBoost,Meta + BERT,0.2,674,0.6068249258160238,0.5806118618618618
