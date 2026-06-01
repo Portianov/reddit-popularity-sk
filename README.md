@@ -1,35 +1,46 @@
-# Reddit Popularity Prediction for Slovak Reddit Posts
+# Predikcia popularity príspevkov na slovenskom Reddite
 
-This repository contains the code, dataset and experiment outputs used for a bachelor thesis focused on predicting the popularity of Reddit posts related to Slovakia.
+Tento repozitár obsahuje kód, dáta a výsledky experimentov k bakalárskej práci zameranej na predikciu popularity Reddit príspevkov súvisiacich so Slovenskom.
 
-The project studies whether the popularity of a Reddit post can be predicted from its text and metadata. Popularity is treated as a three-class classification problem:
+Cieľom projektu je zistiť, či je možné na základe textu príspevku a jeho metadát odhadnúť, do akej triedy popularity bude patriť.
 
-- `0` — low popularity,
-- `1` — medium popularity,
-- `2` — high popularity.
+Popularita je rozdelená do troch tried:
 
-The classes are created from the Reddit `score` column using the 25th and 75th percentiles.
+- `0` — nízka popularita,
+- `1` — stredná popularita,
+- `2` — vysoká popularita.
 
-## Main contribution
+Triedy boli vytvorené zo stĺpca `score` pomocou 25. a 75. percentilu.
 
-The repository supports the thesis contribution in three ways:
+## Čo obsahuje projekt
 
-1. It contains a dataset of Reddit posts related to Slovakia and Slovak online communities.
-2. It compares several feature representations: metadata, TF-IDF and multilingual Sentence-BERT embeddings.
-3. It includes additional analysis of factors related to popularity, such as publication time, content type and flair category.
+Projekt obsahuje:
 
-The project is focused on the Slovak and partially multilingual Reddit environment. This is relevant because the dataset contains posts from Slovak subreddits as well as international subreddits filtered by Slovakia-related keywords.
+1. dataset Reddit príspevkov súvisiacich so Slovenskom,
+2. skripty na zber a spracovanie dát,
+3. porovnanie viacerých modelov strojového učenia,
+4. porovnanie rôznych typov príznakov,
+5. finálne vyhodnotenie najlepších konfigurácií na oddelenej testovacej množine,
+6. analýzu faktorov, ktoré môžu súvisieť s popularitou príspevkov.
 
-## Repository structure
+V práci boli použité hlavne tieto typy príznakov:
+
+- meta-údaje,
+- TF-IDF reprezentácia textu,
+- Sentence-BERT embeddingy.
+
+Okrem samotnej predikcie boli analyzované aj ďalšie faktory, napríklad čas publikovania, typ obsahu a flair kategórie.
+
+## Štruktúra repozitára
 
 ```text
 .
 ├── data/
 │   └── reddit_slovakia_raw_big_20260220_101852.csv
 ├── figures/
-│   └── generated figures used in the thesis
+│   └── grafy použité v práci
 ├── results/
-│   └── CSV/TXT outputs of the experiments
+│   └── výsledky experimentov
 ├── src/
 │   ├── 01_fetch_posts.py
 │   ├── 02_time_analysis.py
@@ -39,6 +50,7 @@ The project is focused on the Slovak and partially multilingual Reddit environme
 │   ├── 06_feature_comparison_logreg.py
 │   ├── 07_compare_all_models.py
 │   ├── 08_confusion_matrix.py
+│   ├── 09_final_test_evaluation.py
 │   └── utils.py
 ├── .env.example
 ├── .gitignore
@@ -48,127 +60,177 @@ The project is focused on the Slovak and partially multilingual Reddit environme
 
 ## Dataset
 
-The final raw dataset is stored in:
+Hlavný dataset sa nachádza v súbore:
 
 ```text
 data/reddit_slovakia_raw_big_20260220_101852.csv
 ```
 
-It contains public Reddit post metadata with the following fields:
+Dataset obsahuje verejne dostupné údaje o Reddit príspevkoch, napríklad:
 
-- `id`
-- `subreddit`
-- `title`
-- `score`
-- `num_comments`
-- `created_utc`
-- `upvote_ratio`
-- `selftext`
-- `flair`
-- `url`
+- `id`,
+- `subreddit`,
+- `title`,
+- `score`,
+- `num_comments`,
+- `created_utc`,
+- `upvote_ratio`,
+- `selftext`,
+- `flair`,
+- `url`.
 
-The target variable is not stored directly in the raw dataset. It is created in the scripts from the `score` column.
+Cieľová premenná popularity sa vytvára v skriptoch zo stĺpca `score`. Príspevky sú rozdelené do troch tried podľa 25. a 75. percentilu skóre.
 
-## Models and features
+## Použité modely
 
-The experiments compare the following models:
+V experimentoch boli testované tieto modely:
 
-- Logistic Regression
-- Decision Tree
-- Random Forest
-- Support Vector Machine
-- XGBoost
+- Logistic Regression,
+- Decision Tree,
+- Random Forest,
+- Support Vector Machine,
+- XGBoost.
 
-The following feature groups are evaluated:
+Testované boli aj rôzne kombinácie príznakov:
 
-- metadata only,
-- TF-IDF only,
-- BERT embeddings only,
-- metadata + TF-IDF,
-- metadata + BERT,
+- iba meta-údaje,
+- iba TF-IDF,
+- iba BERT embeddingy,
+- meta-údaje + TF-IDF,
+- meta-údaje + BERT,
 - TF-IDF + BERT,
-- all features combined.
+- všetky príznaky spolu.
 
-Text embeddings are generated using:
+Na vytvorenie embeddingov bol použitý model:
 
 ```text
 sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
 ```
 
-## Installation
+## Metodika vyhodnotenia
 
-Create and activate a virtual environment:
+Dataset bol rozdelený na dve časti:
 
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-```
+- 80 % dát bolo použitých ako trénovacia a validačná časť,
+- 20 % dát bolo ponechaných ako finálna testovacia množina.
 
-Install dependencies:
+Na trénovacej a validačnej časti bola použitá 5-násobná stratifikovaná krížová validácia. Tá slúžila na porovnanie kombinácií príznakov, modelov a vybraných hyperparametrov.
+
+Finálna testovacia množina nebola použitá pri výbere modelu. Bola použitá až na záverečné vyhodnotenie najlepších konfigurácií.
+
+## Inštalácia
+
+Potrebné knižnice sa dajú nainštalovať pomocou:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Reddit API credentials
-
-The data collection script uses Reddit API credentials. Do not commit real credentials to GitHub.
-
-Create a local `.env` file based on `.env.example`:
+Prípadne je možné najskôr vytvoriť virtuálne prostredie:
 
 ```bash
+python -m venv .venv
+```
+
+Aktivácia vo Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+Ak nastane problém s knižnicou `torch` vo Windows, je možné nainštalovať CPU verziu PyTorch samostatne:
+
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+```
+
+## Reddit API
+
+Na zber nových dát je potrebné mať Reddit API údaje. Skutočné prihlasovacie údaje sa nemajú ukladať na GitHub.
+
+V lokálnom projekte je potrebné vytvoriť súbor `.env` podľa súboru `.env.example`:
+
+```env
 REDDIT_CLIENT_ID=your_client_id_here
 REDDIT_CLIENT_SECRET=your_client_secret_here
 REDDIT_USER_AGENT=reddit_popularity:v1.0 (by u/your_username)
 ```
 
-## Running the scripts
+## Spustenie skriptov
 
-Run scripts from the repository root.
+Skripty sa spúšťajú z hlavného priečinka repozitára.
 
-Time analysis:
+Analýza času publikovania:
 
 ```bash
 python src/02_time_analysis.py
 ```
 
-Post type analysis:
+Analýza typu obsahu:
 
 ```bash
 python src/03_post_type_analysis.py
 ```
 
-Flair analysis:
+Analýza flair kategórií:
 
 ```bash
 python src/04_flair_analysis.py
 ```
 
-Feature importance:
+Analýza dôležitosti príznakov:
 
 ```bash
 python src/05_feature_importance.py
 ```
 
-Comparison of feature combinations using Logistic Regression:
+Porovnanie kombinácií príznakov pomocou Logistic Regression:
 
 ```bash
 python src/06_feature_comparison_logreg.py
 ```
 
-Comparison of all models and feature combinations:
+Porovnanie všetkých modelov a kombinácií príznakov:
 
 ```bash
 python src/07_compare_all_models.py
 ```
 
-Confusion matrix for the best configuration:
+Confusion matrix pre model Meta + BERT + XGBoost:
 
 ```bash
 python src/08_confusion_matrix.py
 ```
 
-## Notes
+Finálne vyhodnotenie najlepších konfigurácií na oddelenej testovacej množine:
 
-The `.env` file and IDE files are intentionally excluded from version control.  
-The repository should not contain Reddit API secrets.
+```bash
+python src/09_final_test_evaluation.py
+```
+
+## Výstupy
+
+Výsledky experimentov sa ukladajú do priečinka:
+
+```text
+results/
+```
+
+Grafy sa ukladajú do priečinka:
+
+```text
+figures/
+```
+
+Medzi hlavné výstupy patria napríklad:
+
+- `feature_comparison_results.csv`,
+- `all_models_feature_comparison_results.csv`,
+- `final_test_results.csv`,
+- `final_classification_reports.txt`,
+- grafy porovnania modelov,
+- finálne confusion matrix grafy.
+
+## Poznámka
+
+Súbor `.env` nie je súčasťou repozitára, pretože môže obsahovať Reddit API kľúče. Na GitHube je uložený iba ukážkový súbor `.env.example`.
