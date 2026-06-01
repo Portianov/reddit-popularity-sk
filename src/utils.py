@@ -1,18 +1,36 @@
 from pathlib import Path
+
 import pandas as pd
 
-DATA_PATH = Path("data/reddit_slovakia_raw_big_20260220_101852.csv")
-FIGURES_DIR = Path("figures")
-RESULTS_DIR = Path("results")
+
+# Project root directory.
+# This makes paths work both when scripts are started from the project root
+# and when they are started directly from the src/ folder in PyCharm.
+BASE_DIR = Path(__file__).resolve().parents[1]
+
+DATA_DIR = BASE_DIR / "data"
+FIGURES_DIR = BASE_DIR / "figures"
+RESULTS_DIR = BASE_DIR / "results"
+
+DATA_PATH = DATA_DIR / "reddit_slovakia_raw_big_20260220_101852.csv"
 
 
 def ensure_dirs() -> None:
-    FIGURES_DIR.mkdir(exist_ok=True)
-    RESULTS_DIR.mkdir(exist_ok=True)
+    """Create output folders if they do not exist."""
+    FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def load_data(path: str | Path = DATA_PATH) -> pd.DataFrame:
     """Load the raw Reddit dataset."""
+    path = Path(path)
+
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Dataset file was not found: {path}\n"
+            "Check whether the CSV file is stored in the data/ folder."
+        )
+
     return pd.read_csv(path)
 
 
@@ -23,7 +41,7 @@ def add_basic_features(df: pd.DataFrame) -> pd.DataFrame:
     df["created_utc"] = pd.to_datetime(
         df["created_utc"],
         unit="s",
-        errors="coerce"
+        errors="coerce",
     )
 
     df["hour"] = df["created_utc"].dt.hour
@@ -35,9 +53,15 @@ def add_basic_features(df: pd.DataFrame) -> pd.DataFrame:
 
     df["title_length"] = df["title"].astype(str).str.len()
     df["selftext_length"] = df["selftext"].astype(str).str.len()
-    df["text"] = df["title"].astype(str) + " " + df["selftext"].astype(str)
+
+    df["text"] = (
+        df["title"].astype(str)
+        + " "
+        + df["selftext"].astype(str)
+    )
 
     df = df.dropna(subset=["hour", "weekday", "score"])
+
     return df
 
 
@@ -56,4 +80,5 @@ def add_popularity_target(df: pd.DataFrame) -> pd.DataFrame:
         return 2      # high popularity
 
     df["popularity_multiclass"] = df["score"].apply(classify)
+
     return df
